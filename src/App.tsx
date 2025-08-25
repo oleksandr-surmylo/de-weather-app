@@ -1,6 +1,5 @@
 import { type FormEvent, useEffect, useState } from "react";
 import { fetchWeatherApi } from "openmeteo";
-import "./App.css";
 import type { SearchResult, WeatherData } from "./types/types.ts";
 import ForecastList from "./components/ForecastList.tsx";
 import CurrentWeather from "./components/CurrentWeather.tsx";
@@ -36,6 +35,12 @@ const WeatherApp = () => {
                         throw new Error ( `Response status: ${ res.status }` );
                     }
                     const data = await res.json ();
+
+                    if ( !data.results || !Array.isArray ( data.results ) ) {
+                        setSearchResult ( [] );
+                        return;
+                    }
+
                     const filteredCity: SearchResult[] = data.results.map ( ( item: SearchResult ) => ( {
                         id: item.id,
                         name: item.name,
@@ -127,6 +132,7 @@ const WeatherApp = () => {
         setCity ( cityData );
         setSearchTerm ( "" );
         setSearchResult ( [] );
+        setError ( "" )
     }
 
     const isCurrentDay = weatherData?.daily.time[ selectedDay ].toLocaleDateString () === weatherData?.current.time.toLocaleDateString ()
@@ -140,7 +146,7 @@ const WeatherApp = () => {
                 <p className="text-blue-100">Wetter für Wassersport in Deutschland</p>
             </div>
             { error && (
-                <div className="bg-red-500 text-white p-2 rounded mb-2">
+                <div className="bg-[#ff6347] text-white p-2 rounded mb-2">
                     { error }
                 </div>
             ) }
@@ -149,6 +155,7 @@ const WeatherApp = () => {
                     type="text"
                     value={ searchTerm }
                     onChange={ ( e ) => setSearchTerm ( e.target.value ) }
+                    onBlur={ ( e ) => setSearchTerm ( e.target.value.trim() ) }
                     placeholder="Stadt in Deutschland eingeben..."
                     className="w-full pl-10 pr-4 py-3 rounded-full bg-white/20 backdrop-blur-md text-white placeholder-blue-100
                     border border-white/30 focus:outline-none focus:border-white/50 focus:bg-white/30"
