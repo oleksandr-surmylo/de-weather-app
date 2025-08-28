@@ -85,9 +85,9 @@ const WeatherApp = () => {
                 latitude: city.latitude,
                 longitude: city.longitude,
                 daily: [ "weather_code", "temperature_2m_max", "temperature_2m_min", "wind_speed_10m_max", "wind_gusts_10m_max", "wind_direction_10m_dominant" ],
+                hourly: [ "temperature_2m", "weather_code" ],
                 models: "icon_seamless",
                 current: [ "temperature_2m", "weather_code", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m" ],
-                timezone: "Europe/Berlin",
                 wind_speed_unit: "ms",
             };
 
@@ -99,7 +99,9 @@ const WeatherApp = () => {
             const utcOffsetSeconds = response.utcOffsetSeconds ();
 
             const current = response.current ()!;
+            const hourly = response.hourly ()!;
             const daily = response.daily ()!;
+
 
             setWeatherData ( {
                     current: {
@@ -109,6 +111,13 @@ const WeatherApp = () => {
                         wind_speed_10m: current.variables ( 2 )!.value (),
                         wind_direction_10m: current.variables ( 3 )!.value (),
                         wind_gusts_10m: current.variables ( 4 )!.value (),
+                    },
+                    hourly: {
+                        time: [ ...Array ( ( Number ( hourly.timeEnd () ) - Number ( hourly.time () ) ) / hourly.interval () ) ].map (
+                            ( _, i ) => new Date ( ( Number ( hourly.time () ) + i * hourly.interval () + utcOffsetSeconds ) * 1000 )
+                        ),
+                        temperature_2m: hourly.variables ( 0 )!.valuesArray (),
+                        weather_code: hourly.variables ( 1 )!.valuesArray (),
                     },
                     daily: {
                         time: [ ...Array ( ( Number ( daily.timeEnd () ) - Number ( daily.time () ) ) / daily.interval () ) ].map (
@@ -130,12 +139,16 @@ const WeatherApp = () => {
 
     const selectCity = ( cityData: SearchResult ) => {
         setCity ( cityData );
+        setSelectedDay ( 0 )
         setSearchTerm ( "" );
         setSearchResult ( [] );
         setError ( "" )
     }
 
     const isCurrentDay = weatherData?.daily.time[ selectedDay ].toLocaleDateString () === weatherData?.current.time.toLocaleDateString ()
+
+    // console.log ( 'daily', weatherData?.daily.time[ selectedDay ].toLocaleDateString () )
+    // console.log ( 'current', weatherData?.current.time.toLocaleDateString () )
 
     if ( !weatherData ) return <div className="text-white">Loading...</div>;
 
@@ -155,7 +168,7 @@ const WeatherApp = () => {
                     type="text"
                     value={ searchTerm }
                     onChange={ ( e ) => setSearchTerm ( e.target.value ) }
-                    onBlur={ ( e ) => setSearchTerm ( e.target.value.trim() ) }
+                    onBlur={ ( e ) => setSearchTerm ( e.target.value.trim () ) }
                     placeholder="Stadt in Deutschland eingeben..."
                     className="w-full pl-10 pr-4 py-3 rounded-full bg-white/20 backdrop-blur-md text-white placeholder-blue-100
                     border border-white/30 focus:outline-none focus:border-white/50 focus:bg-white/30"

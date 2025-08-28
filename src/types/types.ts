@@ -8,6 +8,11 @@ export interface WeatherData {
         wind_gusts_10m_max: Float32Array | null;
         wind_direction_10m_dominant: Float32Array | null;
     },
+    hourly: {
+        time: Date[];
+        temperature_2m: Float32Array | null;
+        weather_code: Float32Array | null;
+    }
     current: {
         time: Date;
         temperature_2m: number | null;
