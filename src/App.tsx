@@ -147,9 +147,6 @@ const WeatherApp = () => {
 
     const isCurrentDay = weatherData?.daily.time[ selectedDay ].toLocaleDateString () === weatherData?.current.time.toLocaleDateString ()
 
-    // console.log ( 'daily', weatherData?.daily.time[ selectedDay ].toLocaleDateString () )
-    // console.log ( 'current', weatherData?.current.time.toLocaleDateString () )
-
     if ( !weatherData ) return <div className="text-white">Loading...</div>;
 
     return (
