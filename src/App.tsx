@@ -20,6 +20,8 @@ const WeatherApp = () => {
     const [ error, setError ] = useState<string | null> ( null );
     const [ loading, setLoading ] = useState ( false );
 
+    const isCurrentDay = weatherData?.daily.time[ selectedDay ].toLocaleDateString () === weatherData?.current.time.toLocaleDateString ()
+
     useEffect ( () => {
         if ( !searchTerm.trim () ) {
             setSearchResult ( [] )
@@ -89,14 +91,13 @@ const WeatherApp = () => {
                 models: "icon_seamless",
                 current: [ "temperature_2m", "weather_code", "wind_speed_10m", "wind_direction_10m", "wind_gusts_10m" ],
                 wind_speed_unit: "ms",
+                timezone: "Europe/Berlin"
             };
 
             const url = "https://api.open-meteo.com/v1/forecast";
             const responses = await fetchWeatherApi ( url, params );
 
             const response = responses[ 0 ];
-
-            const utcOffsetSeconds = response.utcOffsetSeconds ();
 
             const current = response.current ()!;
             const hourly = response.hourly ()!;
@@ -105,7 +106,7 @@ const WeatherApp = () => {
 
             setWeatherData ( {
                     current: {
-                        time: new Date ( ( Number ( current.time () ) + utcOffsetSeconds ) * 1000 ),
+                        time: new Date ( ( Number ( current.time () )) * 1000 ),
                         temperature_2m: current.variables ( 0 )!.value (),
                         weather_code: current.variables ( 1 )!.value (),
                         wind_speed_10m: current.variables ( 2 )!.value (),
@@ -114,14 +115,14 @@ const WeatherApp = () => {
                     },
                     hourly: {
                         time: [ ...Array ( ( Number ( hourly.timeEnd () ) - Number ( hourly.time () ) ) / hourly.interval () ) ].map (
-                            ( _, i ) => new Date ( ( Number ( hourly.time () ) + i * hourly.interval () + utcOffsetSeconds ) * 1000 )
+                            ( _, i ) => new Date ( ( Number ( hourly.time () ) + i * hourly.interval () ) * 1000 )
                         ),
                         temperature_2m: hourly.variables ( 0 )!.valuesArray (),
                         weather_code: hourly.variables ( 1 )!.valuesArray (),
                     },
                     daily: {
                         time: [ ...Array ( ( Number ( daily.timeEnd () ) - Number ( daily.time () ) ) / daily.interval () ) ].map (
-                            ( _, i ) => new Date ( ( Number ( daily.time () ) + i * daily.interval () + utcOffsetSeconds ) * 1000 )
+                            ( _, i ) => new Date ( ( Number ( daily.time () ) + i * daily.interval () ) * 1000 )
                         ),
                         weather_code: daily.variables ( 0 )!.valuesArray (),
                         temperature_2m_max: daily.variables ( 1 )!.valuesArray (),
@@ -145,7 +146,6 @@ const WeatherApp = () => {
         setError ( "" )
     }
 
-    const isCurrentDay = weatherData?.daily.time[ selectedDay ].toLocaleDateString () === weatherData?.current.time.toLocaleDateString ()
 
     if ( !weatherData ) return <div className="text-white">Loading...</div>;
 

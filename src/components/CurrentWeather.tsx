@@ -11,13 +11,16 @@ interface CurrentWeatherProps {
 
 const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: CurrentWeatherProps ) => {
 
+        const timeNow = new Date ().getHours ();
+
         function getDaySlice ( selectedDay: number ) {
             const start = selectedDay * 24;
             const end = start + 24;
+            const effectiveStart = isCurrentDay ? timeNow : start;
             return {
-                time: weatherData.hourly.time.slice ( start, end ),
-                temperature: weatherData.hourly.temperature_2m?.slice ( start, end ),
-                code: weatherData.hourly.weather_code?.slice ( start, end ),
+                time: weatherData.hourly.time.slice ( effectiveStart, end ),
+                temperature: weatherData.hourly.temperature_2m?.slice ( effectiveStart, end ),
+                code: weatherData.hourly.weather_code?.slice ( effectiveStart, end ),
             };
         }
 
@@ -42,7 +45,7 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
                     <div className="flex items-end gap-4">
                         <div className="leading-none">
                             { !isCurrentDay &&
-                                <span>{ weatherData.daily.time[ selectedDay ].toLocaleDateString ("de-DE", {
+                                <span>{ weatherData.daily.time[ selectedDay ].toLocaleDateString ( "de-DE", {
                                     weekday: "long",
                                 } ) }</span>
                             }
@@ -83,7 +86,6 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
                                 <div
                                     className="text-blue-200 text-sm mb-2">
                                     { timeFormated.toLocaleTimeString ( "de-DE", {
-                                        timeZone: "UTC",
                                         hour: "2-digit",
                                         minute: "2-digit",
                                     } ) }
