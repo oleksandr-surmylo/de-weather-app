@@ -25,7 +25,7 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
             };
         }
 
-        const today = getDaySlice (0);
+        const today = getDaySlice (selectedDay);
 
         return (
             <div
@@ -90,7 +90,6 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
                                 <div
                                     className="text-blue-200 text-sm mb-2">
                                     { time.toLocaleTimeString ( "de-DE", {
-                                        timeZone: "UTC",
                                         hour: "2-digit",
                                         minute: "2-digit",
                                     } ) }
