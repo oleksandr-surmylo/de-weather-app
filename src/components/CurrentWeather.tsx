@@ -1,6 +1,7 @@
 import { WeatherIcon } from "./WeatherIcon.tsx";
 import { formatTemperature } from "../utils/formatTemp.ts";
 import type { SearchResult, WeatherData } from "../types/types.ts";
+import WeatherStat from "./WeatherStat.tsx";
 
 interface CurrentWeatherProps {
     city: SearchResult;
@@ -11,17 +12,22 @@ interface CurrentWeatherProps {
 
 const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: CurrentWeatherProps ) => {
 
+        const timeNow = new Date ().getHours ();
+
         function getDaySlice ( selectedDay: number ) {
             const start = selectedDay * 24;
             const end = start + 24;
+            const effectiveStart = isCurrentDay ? timeNow : start;
             return {
-                time: weatherData.hourly.time.slice ( start, end ),
-                temperature: weatherData.hourly.temperature_2m?.slice ( start, end ),
-                code: weatherData.hourly.weather_code?.slice ( start, end ),
+                time: weatherData.hourly.time.slice ( effectiveStart, end ),
+                temperature: weatherData.hourly.temperature_2m?.slice ( effectiveStart, end ),
+                code: weatherData.hourly.weather_code?.slice ( effectiveStart, end ),
             };
         }
 
-        const today = getDaySlice ( selectedDay );
+        const today = getDaySlice (0);
+
+        console.log (today.code)
 
         return (
             <div
@@ -36,13 +42,17 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
                     <div className="shrink-0 bg-white/10 rounded-2xl p-4">
                         <WeatherIcon
                             size={ 64 }
-                            type={ weatherData.daily.weather_code?.[ selectedDay ] || 0 }
+                            type={
+                                isCurrentDay
+                                    ? today.code?.[ 0 ] ?? 0
+                                    : weatherData.daily.weather_code?.[ selectedDay ] ?? 0
+                            }
                         />
                     </div>
                     <div className="flex items-end gap-4">
                         <div className="leading-none">
                             { !isCurrentDay &&
-                                <span>{ weatherData.daily.time[ selectedDay ].toLocaleDateString ("de-DE", {
+                                <span>{ weatherData.daily.time[ selectedDay ].toLocaleDateString ( "de-DE", {
                                     weekday: "long",
                                 } ) }</span>
                             }
@@ -74,7 +84,6 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
                 </div>
                 <div className="flex space-x-4 pb-2 overflow-x-auto my-5">
                     { today.time.map ( ( time, index ) => {
-                        const timeFormated = ( time )
                         return (
                             <div
                                 key={ index }
@@ -82,7 +91,7 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
                             >
                                 <div
                                     className="text-blue-200 text-sm mb-2">
-                                    { timeFormated.toLocaleTimeString ( "de-DE", {
+                                    { time.toLocaleTimeString ( "de-DE", {
                                         timeZone: "UTC",
                                         hour: "2-digit",
                                         minute: "2-digit",
@@ -102,37 +111,31 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
                     } ) }
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-5 sm:mt-auto">
-                    {/* Wind Speed */ }
-                    <div className="bg-white/10 rounded-xl p-4">
-                        <div className="flex flex-col text-blue-200 text-xs uppercase tracking-wide truncate">
-                            <span title="Windgeschwindigkeit">Windgeschwindigkeit</span>
-                        </div>
-                        <div className="text-white font-semibold mt-1">
-                            { formatTemperature ( isCurrentDay
-                                ? weatherData.current.wind_speed_10m
-                                : weatherData.daily.wind_speed_10m_max?.[ selectedDay ] ) } m/s
-                        </div>
-                    </div>
-                    <div className="bg-white/10 rounded-xl p-4">
-                        <div className="flex flex-col text-blue-200 text-xs uppercase tracking-wide">
-                            <span title="Windgeschwindigkeit">Windböen</span>
-                        </div>
-                        <div className="text-white font-semibold mt-1">
-                            { formatTemperature ( isCurrentDay
-                                ? weatherData.current.wind_gusts_10m
-                                : weatherData.daily.wind_gusts_10m_max?.[ selectedDay ] ) } m/s
-                        </div>
-                    </div>
-                    <div className="bg-white/10 rounded-xl p-4">
-                        <div className="flex flex-col text-blue-200 text-xs uppercase tracking-wide">
-                            <span title="Windgeschwindigkeit">Windrichtung</span>
-                        </div>
-                        <div className="text-white font-semibold mt-1">
-                            { formatTemperature ( isCurrentDay
-                                ? weatherData.current.wind_direction_10m
-                                : weatherData.daily.wind_direction_10m_dominant?.[ selectedDay ] ) }°
-                        </div>
-                    </div>
+                    <WeatherStat
+                        label="Windgeschwindigkeit"
+                        value={ isCurrentDay ?
+                            weatherData.current.wind_speed_10m ?? 0
+                            : weatherData.daily.wind_speed_10m_max?.[ selectedDay ] ?? 0
+                        }
+                        unit="m/s"
+                    />
+                    <WeatherStat
+                        label="Windböen"
+                        value={ isCurrentDay
+                            ? weatherData.current.wind_gusts_10m ?? 0
+                            : weatherData.daily.wind_gusts_10m_max?.[ selectedDay ] ?? 0
+                        }
+                        unit="m/s"
+                    />
+                    <WeatherStat
+                        label="Windrichtung"
+                        value={ isCurrentDay
+                            ? weatherData.current.wind_direction_10m ?? 0
+                            : weatherData.daily.wind_direction_10m_dominant?.[ selectedDay ] ?? 0
+                        }
+                        unit="°"
+                    />
+
                 </div>
             </div>
         )
