@@ -27,8 +27,6 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
 
         const today = getDaySlice (0);
 
-        console.log (today.code)
-
         return (
             <div
                 className="relative flex flex-col bg-white/20 backdrop-blur-md rounded-3xl p-6 border border-white/30 max-w-lg min-h-80 mt-3">
