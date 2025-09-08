@@ -8,8 +8,11 @@ interface WeatherStatProps {
 
 const WeatherStat = ( { label, value, unit }: WeatherStatProps ) => (
     <div className="bg-white/10 rounded-xl p-4">
-        <div className="flex flex-col text-blue-200 text-xs uppercase tracking-wide">
-            <span title={ label }>{ label }</span>
+        <div
+            className="flex flex-col text-blue-200 text-xs uppercase tracking-wide"
+        >
+            <span title={ label }
+                  className={ `${ label === "Windgeschwindigkeit" ? "truncate" : "" }` }>{ label }</span>
         </div>
         <div className="text-white font-semibold mt-1">
             { formatTemperature ( value ) } { unit }
