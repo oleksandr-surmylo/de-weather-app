@@ -29,7 +29,7 @@ const CurrentWeather = ( { selectedDay, isCurrentDay, weatherData, city }: Curre
 
         return (
             <div
-                className="relative flex flex-col bg-white/20 backdrop-blur-md rounded-3xl p-6 border border-white/30 max-w-lg min-h-80 mt-3">
+                className="flex flex-col relative self-start bg-white/20 backdrop-blur-md rounded-3xl p-6 border border-white/30 max-w-lg min-h-80 mt-3">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="uppercase tracking-wider text-white text-2xl font-semibold">
                         { city.name }

@@ -150,7 +150,7 @@ const WeatherApp = () => {
     if ( !weatherData ) return <div className="text-white">Loading...</div>;
 
     return (
-        <div className="min-h-screen  bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 p-6">
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 p-6">
             <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold text-white mb-2">SurferWeather</h1>
                 <p className="text-blue-100">Wetter für Wassersport in Deutschland</p>
@@ -160,9 +160,10 @@ const WeatherApp = () => {
                     { error }
                 </div>
             ) }
-            <form onSubmit={ handleSearch } className="relative max-w-md mx-auto mb-8">
+            <form onSubmit={ handleSearch } className="relative max-w-96 w-full mx-auto mb-8">
                 <input
                     type="text"
+                    name="search"
                     value={ searchTerm }
                     onChange={ ( e ) => setSearchTerm ( e.target.value ) }
                     onBlur={ ( e ) => setSearchTerm ( e.target.value.trim () ) }
@@ -188,7 +189,7 @@ const WeatherApp = () => {
             { loading ? (
                 <div className="text-white text-center">Loading...</div>
             ) : (
-                <>
+                <div className="max-w-full mx-auto">
                     <ForecastList
                         city={ city }
                         weatherData={ weatherData }
@@ -201,7 +202,7 @@ const WeatherApp = () => {
                         weatherData={ weatherData }
                         selectedDay={ selectedDay }
                     />
-                </>
+                </div>
             ) }
         </div>
     );

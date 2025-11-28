@@ -12,11 +12,11 @@ interface ForecastListProps {
 
 const ForecastList = ( { city, weatherData, setSelectedDay, selectedDay }: ForecastListProps ) => {
     return (
-        <div className="bg-white/20 backdrop-blur-md rounded-3xl p-6 border border-white/30 max-w-4xl mx-auto">
+        <div className="flex flex-col bg-white/20 backdrop-blur-md rounded-3xl p-6 border border-white/30 mx-auto overflow-x-auto">
             <h3 className="uppercase tracking-wider text-white text-lg font-semibold mb-4">
                 { city.name }
             </h3>
-            <div className="flex space-x-4 pb-2 overflow-x-auto md:overflow-visible">
+            <div className="flex space-x-4 pb-2 overflow-x-scroll md:overflow-x-visible">
                 { weatherData?.daily.time.map ( ( time, index ) => {
                     const isToday = new Date ().toLocaleDateString () === new Date ( time ).toLocaleDateString ();
                     return (
